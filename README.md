@@ -1,4 +1,5 @@
 # Scriptables-widget-ios
+https://docs.scriptable.app/
 
 <a href="https://www.icloud.com/shortcuts/962ad0ba01da43b098eddbb3ce9390be">Install Shortcut</a>
 
