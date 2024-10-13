@@ -1,14 +1,10 @@
-const h=5
-  
-const w = new ListWidget()
-w.backgroundColor=new Color("#222222")
+const widget = new ListWidget()
+widget.backgroundColor=new Color("#222222")
 
 // workout contents
 const fileManager = FileManager.iCloud()
 const dataPath =  fileManager.documentsDirectory() + "/health_data.json"
-
-
-let stretchData = {}
+let meditateData = {}
 let workoutData = {}
 
 // NEW DATA
@@ -27,15 +23,15 @@ if (fileManager.fileExists(dataPath)) {
   let dataContent = fileManager.readString(dataPath)
   dataContent = JSON.parse(dataContent)
   
-  stretchData = dataContent["Meditate"] || {}
+  meditateData = dataContent["Meditate"] || {}
   workoutData = dataContent["Exercise"] || {}
 }
 
 // Make widget
-w.addImage(getCalendarImage())
-w.presentMedium()
+widget.addImage(getCalendarImage())
+widget.presentMedium()
 
-Script.setWidget(w)
+Script.setWidget(widget)
 Script.complete()
 
 function formatDate(d) {
@@ -55,14 +51,14 @@ function getCalendarImage() {
   const width = 200
   const colWidth = width / 7.0
 
-  const titlew = w.addText("Habit Log")
-  titlew.textColor = new Color("#e587ce")
-  titlew.font = Font.boldSystemFont(13)
-  w.addSpacer(6)
+  const titlew = widget.addText("Healthy Living Log.                                             🔥   🚀")
+  titlew.textColor = new Color("#C4B454")
+  titlew.font = Font.boldSystemFont(12)
+  widget.addSpacer(6)
   
   const context = new DrawContext()
   //context.size = new Size(colWidth * 7, (colWidth + 6) * 3)
-  context.size = new Size(320, (colWidth + 6) * 3)
+  context.size = new Size(320, (colWidth +6) * 3)
   context.opaque = false
   context.respectScreenScale = true
 
@@ -74,67 +70,33 @@ function getCalendarImage() {
       var offset = weekOffset[i]
       
       var curr = new Date; // get current date
-      var dateOfFirstDayOfThisWeek = new Date(curr.setDate(curr.getDate() - curr.getDay() + 1)) //starting from monday
+      var dateOfFirstDayOfThisWeek = new Date(curr.setDate(curr.getDate() - curr.getDay()+1))
       var day = new Date(dateOfFirstDayOfThisWeek.setDate(dateOfFirstDayOfThisWeek.getDate() + offset + col))
       
       const dataKey = formatDate(day)
-      const stretchForDay = stretchData[dataKey]
+      const meditateForDay = meditateData[dataKey]
       const workoutForDay = workoutData[dataKey]
       
-      // left
-      if (stretchForDay) {
-        context.setFillColor(new Color("#0198E1"))
+      // blue
+      if (workoutForDay) {
+        context.setFillColor(new Color("#8A9A5B"))
         let path = new Path()
-        path.addRoundedRect(new Rect(x + 1, y + 2, 2, height - 4), 2, 2)  // Change to vertical line
+        path.addRoundedRect(new Rect(x + 2, y + height - 1, width - 4, 2), 2, 2)
         context.addPath(path)
         context.fillPath()
       }
-
-      //right
-      if (stretchForDay) {
-        context.setFillColor(new Color("#0198E1"))
-        let path = new Path()
-        path.addRoundedRect(new Rect(x + width - 3, y + 2, 2, height - 4), 2, 2)  // Vertical line on the right
-        context.addPath(path)
-        context.fillPath()
+      
+      // green
+      path = new Path()
+      if (meditateForDay) { 
+        context.setFillColor(new Color("#1DB954"))
+        path.addEllipse(new Rect(x + 2, y, width - 4, height - 4))
+      } else {
+        context.setFillColor(new Color("#355E3B"))
+        path.addEllipse(new Rect(x + 3, y + 1, width - 6, height - 6))
       }
-
-
-      //top
-      if (stretchForDay) {
-        context.setFillColor(new Color("#0198E1"))
-        let path = new Path()
-        path.addRoundedRect(new Rect(x + 2, y, width - 4, 2), 2, 2)
-         context.addPath(path)
-         context.fillPath()
-      }
-
-
-
-      //bottom
-       
-      if (stretchForDay) {
-        context.setFillColor(new Color("#0198E1"))
-        let path = new Path()
-        path.addRoundedRect(new Rect(x + 2, y + height - 3, width - 4, 2), 2, 2)
-        context.addPath(path)
-        context.fillPath()
-      }
-
-
-
-
-    //   // sherbet
-    //   path = new Path()
-    //   if (workoutForDay) {
-    //     context.setFillColor(new Color("#dc7474"))
-    //     path.addEllipse(new Rect(x + 2, y, width - 4, height - 4))
-    //   } else {
-    //     context.setFillColor(new Color("#dc747466"))
-    //     path.addEllipse(new Rect(x + 3, y + 1, width - 6, height - 6))
-    //   }
-    //   context.addPath(path)
-    //   context.fillPath()
+      context.addPath(path)
+      context.fillPath()
       
       let font = Font.lightSystemFont(12)
       if (day.getDate() === (new Date).getDate()) {
@@ -158,7 +120,7 @@ function getCalendarImage() {
   }
   
   drawWorkoutLegend(context, 220, 0, colWidth)
-  drawStretched(context, 220, colWidth + 6, colWidth)
+  drawMeditated(context, 220, colWidth + 6, colWidth)
   
   return context.getImage()
 }
@@ -178,26 +140,98 @@ function drawWeek(context, week, colWidth, callback) {
   }
 }
 
-function drawWorkoutLegend(context, x, y, colWidth) {  
-  context.setFillColor(new Color("#dc7474"))
-  let path = new Path()
-  path.addEllipse(new Rect(x, y, colWidth - 4, colWidth - 4))
-  context.addPath(path)
-  context.fillPath()
-  
-  context.setTextAlignedLeft()
-  context.setTextColor(new Color("#ffffff"))
-  context.drawTextInRect("Exercised", new Rect(x + colWidth + 2, y + 4, 80, colWidth))
+
+
+
+// Function to get current streak for a habit
+function getCurrentStreak(habitData) {
+  if (!habitData || Object.keys(habitData).length === 0) {
+    return 0  // Edge case: No data
+  }
+
+  const today = new Date()
+  let streak = 0
+
+  // Iterate backwards day by day, checking for the habit
+  for (let i = 0; i < 365; i++) {
+    const checkDate = new Date(today)
+    checkDate.setDate(today.getDate() - i)
+
+    const formattedDate = formatDate(checkDate)
+
+    // If the habit is logged for the day, increase the streak
+    if (habitData[formattedDate]) {
+      streak++
+    } else {
+      // If no habit found for a day, the streak is broken
+      break
+    }
+  }
+
+  return streak
 }
 
-function drawStretched(context, x, y, colWidth) {  
-  context.setFillColor(new Color("#0198E1"))
+// Function to get maximum streak for a habit
+function getMaxStreak(habitData) {
+  if (!habitData || Object.keys(habitData).length === 0) {
+    return 0  // Edge case: No data
+  }
+
+  let maxStreak = 0
+  let currentStreak = 0
+  let previousDate = null
+
+  // Iterate through all recorded days in habitData
+  Object.keys(habitData).sort().forEach((dateKey) => {
+    const habitLogged = habitData[dateKey]
+    
+    if (habitLogged) {
+      // Convert the date string back to a Date object
+      const currentDate = new Date(dateKey)
+      
+      // If this is the first day or the current day is consecutive to the previous
+      if (previousDate && (currentDate - previousDate) === 86400000) {
+        currentStreak++
+      } else {
+        // Reset the current streak if it's not consecutive
+        currentStreak = 1
+      }
+      
+      // Update the max streak if needed
+      if (currentStreak > maxStreak) {
+        maxStreak = currentStreak
+      }
+      
+      previousDate = currentDate
+    }
+  })
+
+  return maxStreak
+}
+
+// Example usage to get current and max streaks for Exercise and Meditation
+
+
+function drawMeditated(context, x, y, colWidth) {  
+  context.setFillColor(new Color("#1DB954"))  // Green color for Meditated
   let path = new Path()
-  path.addRoundedRect(new Rect(x, y + 10, colWidth - 4, 2), 2, 2)
+  path.addRoundedRect(new Rect(x-11, y+5, colWidth-15, colWidth-15), 10,10)  // Medium-sized box with rounded corners
   context.addPath(path)
   context.fillPath()
   
   context.setTextAlignedLeft()
   context.setTextColor(new Color("#ffffff"))
-  context.drawTextInRect("Meditated", new Rect(x + colWidth + 2, y + 4, 90, colWidth))
+  context.drawTextInRect(`Meditate:  ${getCurrentStreak(meditateData)}  ${getMaxStreak(meditateData)}`, new Rect(x + 5, y + 4, 200, colWidth))
+}
+
+function drawWorkoutLegend(context, x, y, colWidth) {  
+  context.setFillColor(new Color("#8A9A5B"))  // Blue color for Exercised
+  let path = new Path()
+  path.addRoundedRect(new Rect(x-11, y+5, colWidth - 15, colWidth - 15), 10, 10)  // Medium-sized box with rounded corners
+  context.addPath(path)
+  context.fillPath()
+  
+  context.setTextAlignedLeft()
+  context.setTextColor(new Color("#ffffff"))
+  context.drawTextInRect(`Exercise:  ${getCurrentStreak(workoutData)}  ${getMaxStreak(workoutData)}`, new Rect(x + 5, y + 4, 200, colWidth ))
 }
