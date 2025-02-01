@@ -1,6 +1,11 @@
 # Scriptables-widget-ios
 https://docs.scriptable.app/
 
+
+Log Activity shortcut - https://www.icloud.com/shortcuts/58c9a33b9986495d986c8bd1ffd6ee12
+
+
+DSA shortcut - https://www.icloud.com/shortcuts/36fa7961d7b544be8e58d4bf43db2de3
 <a href="https://www.icloud.com/shortcuts/962ad0ba01da43b098eddbb3ce9390be">Install Shortcut</a>
 
 Iphone Scriptable widgets
